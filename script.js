@@ -78,7 +78,7 @@ function drawLine(x1, y1, x2, y2) {
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
     context.strokeStyle = '#8ab2d8'
-    context.lineWidth = 0.05;
+    context.lineWidth = 0.02;
     context.stroke();
   }
 }
@@ -91,55 +91,77 @@ function distance(x1, y1, x2, y2) {
 }
 
 function draw() {
-  for(var i =0, l=points.length; i<l; i++) {
-    // circles
-    var point = points[i];
-    point.x += point.vx;
-    point.y += point.vy;
-    drawCircle(point.x, point.y);
-    // lines
+
+  if (window.scrollY < 1000) {
     
+    for(var i =0, l=points.length; i<l; i++) {
+      // circles
+      var point = points[i];
+      point.x += point.vx;
+      point.y += point.vy;
+      drawCircle(point.x, point.y);
+      // lines
+      
 
-    // Filter out the pairs of points that have the desired distance
-    let pairs = points.filter((p1, i) => {
-      // Compare each point with the rest of the array
-      return points.slice(i + 1).some(p2 => {
-        let d = distance(p1.x, p1.y, p2.x, p2.y)
-        // Return true if d equals distance
-        return d <= distanceToDraw;
+      // Filter out the pairs of points that have the desired distance
+      let pairs = points.filter((p1, i) => {
+        // Compare each point with the rest of the array
+        return points.slice(i + 1).some(p2 => {
+          let d = distance(p1.x, p1.y, p2.x, p2.y)
+          // Return true if d equals distance
+          return d <= distanceToDraw;
+        });
       });
-    });
 
-    // Draw a line between each pair of points
-    pairs.forEach(p1 => {
-      // Find the matching point for p1 in the array
-      let p2 = points.find(p2 => {
-        let d = distance(p1.x, p1.y, p2.x, p2.y)
-        // Return true if d equals distance
-        return d <= distanceToDraw;
+      // Draw a line between each pair of points
+      pairs.forEach(p1 => {
+        // Find the matching point for p1 in the array
+        let p2 = points.find(p2 => {
+          let d = distance(p1.x, p1.y, p2.x, p2.y)
+          // Return true if d equals distance
+          return d <= distanceToDraw;
+        });
+        // Call drawLine function with the coordinates of p1 and p2
+        drawLine(p1.x, p1.y, p2.x, p2.y);
+        // console.log("hmmmmm")
       });
-      // Call drawLine function with the coordinates of p1 and p2
-      drawLine(p1.x, p1.y, p2.x, p2.y);
-      // console.log("hmmmmm")
-    });
 
 
-    // drawLine(point.x, point.y, point.buddy.x, point.buddy.y);
-    // check for edge
-    if(point.x < 0+radius) {
-      resetVelocity(point, 'x', 1);
-    } else if(point.x > boundaryX-radius) {
-      resetVelocity(point, 'x', -1);
-    } else if(point.y < 0+radius) {
-      resetVelocity(point, 'y', 1);
-    } else if(point.y > boundaryY-radius) {
-      resetVelocity(point, 'y', -1);
-    } 
+      // drawLine(point.x, point.y, point.buddy.x, point.buddy.y);
+      // check for edge
+      if(point.x < 0+radius) {
+        resetVelocity(point, 'x', 1);
+      } else if(point.x > boundaryX-radius) {
+        resetVelocity(point, 'x', -1);
+      } else if(point.y < 0+radius) {
+        resetVelocity(point, 'y', 1);
+      } else if(point.y > boundaryY-radius) {
+        resetVelocity(point, 'y', -1);
+      } 
+    }
   }
 }
 
 function animate() {
+  
   context.clearRect ( 0 , 0 , canvas.width , canvas.height );
   draw();
   requestAnimationFrame(animate);
+  
+}
+
+window.onscroll = function() {
+
+  // ubah animasi tergantung koordinat scroll
+  // console.log(window.scrollY)
+  const navAlpha = window.scrollY/100
+  if (navAlpha >= 0) {
+
+    let realOpacity = navAlpha > 1 ? 1 : navAlpha;
+    const navContainer = document.querySelector(".nav-container")
+    navContainer.style.backgroundColor = "rgba(96, 54, 1, "+realOpacity+")"
+
+  }
+  
+
 }
